@@ -1,0 +1,8 @@
+{
+  "name": "defhax-badge-puzzle",
+  "version": "0.0.0",
+  "description": "A system for finding and collaberating on solving the badge puzzle",
+  "main": "server.js",
+  "repository": "git@github.com:defhax/defcon22-badge.git",
+  "author": "Def Hax <defhax19999827665@gmail.com>"
+}
