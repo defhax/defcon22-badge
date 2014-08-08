@@ -1,84 +1,49 @@
-//
-// # SimpleServer
-//
-// A simple chat server using Socket.IO, Express, and Async.
-//
-var http = require('http');
-var path = require('path');
+#! /home/ubuntu/.nvm/v0.10.26/bin/node
 
-var async = require('async');
-var socketio = require('socket.io');
-var express = require('express');
+var fs = require('fs');
 
-//
-// ## SimpleServer `SimpleServer(obj)`
-//
-// Creates a new instance of SimpleServer with the following options:
-//  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
-//
-var router = express();
-var server = http.createServer(router);
-var io = socketio.listen(server);
+var chars = " abcdefghijklmnopqrstuvwxyz".split('');
 
-router.use(express.static(path.resolve(__dirname, 'client')));
-var messages = [];
-var sockets = [];
+var offset = 13;
 
-io.on('connection', function (socket) {
-    messages.forEach(function (data) {
-      socket.emit('message', data);
-    });
-
-    sockets.push(socket);
-
-    socket.on('disconnect', function () {
-      sockets.splice(sockets.indexOf(socket), 1);
-      updateRoster();
-    });
-
-    socket.on('message', function (msg) {
-      var text = String(msg || '');
-
-      if (!text)
-        return;
-
-      socket.get('name', function (err, name) {
-        var data = {
-          name: name,
-          text: text
-        };
-
-        broadcast('message', data);
-        messages.push(data);
-      });
-    });
-
-    socket.on('identify', function (name) {
-      socket.set('name', String(name || 'Anonymous'), function (err) {
-        updateRoster();
-      });
-    });
-  });
-
-function updateRoster() {
-  async.map(
-    sockets,
-    function (socket, callback) {
-      socket.get('name', callback);
-    },
-    function (err, names) {
-      broadcast('roster', names);
+function dealWithRotation(content, offset){
+  var result = content.split(' ').map(function(index, idx){
+    var lookup = parseInt(index, 0);
+    if (lookup !== 0) {
+      lookup += offset;
     }
-  );
+    if (lookup > 26) {
+      lookup %= 26;
+    }
+    return chars[lookup];
+  }).join("");
+  console.log(result);  
 }
 
-function broadcast(event, data) {
-  sockets.forEach(function (socket) {
-    socket.emit(event, data);
+function dealWithAscii(content) {
+  var result = content.split('\n').map(function(line){
+    return line.split(' ').map(function(code, idx){
+      return String.fromCharCode(code);
+    }).join("");
   });
+  console.log(result);
 }
 
-server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
-  var addr = server.address();
-  console.log("Chat server listening at", addr.address + ":" + addr.port);
-});
+process.argv.shift(); // node
+process.argv.shift(); // server
+var arg;
+for( ; arg = process.argv.shift() ;) {
+  arg = arg.split(':');
+  fs.readFile(arg[0], 'utf-8', (function(program){
+    return function(err, content){
+      if (program === '0') {
+        for (var i = 0; i < 27; i++) {
+            dealWithRotation(content, i);
+        } 
+      } else {
+        dealWithAscii(content);
+      }
+    };
+  }(arg[1])));  
+}
+
