@@ -50,6 +50,10 @@ function stringToNum(content) {
   }).join(' ');
 }
 
+function base64decode(content) {
+  console.log(atob(content));
+}
+
 process.argv.shift(); // node
 process.argv.shift(); // server
 var arg;
@@ -77,6 +81,8 @@ for( ; arg = process.argv.shift() ;) {
       } else if (program === '3') {
         // binary
         dealWithBinary(content);
+      } else if (program === '5') {
+        base64decode(content);
       }
     };
   }(arg[1])));  
