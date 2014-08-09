@@ -38,6 +38,12 @@ function dealWithBinary(content) {
   console.log(result);
 }
 
+function fromHex(content) {
+  return content.split(' ').map(function(hex){
+    return parseInt(hex, 16);
+  }).join(' ');
+}
+
 function stringToNum(content) {
   return content.split('').map(function(letter){
     return chars.indexOf(letter);
@@ -56,12 +62,17 @@ for( ; arg = process.argv.shift() ;) {
           // convert ascii to numbers for rotation
           content = stringToNum(content);
         }
+        
         // rotation cypher
         for (var i = 0; i < 27; i++) {
             dealWithRotation(content, i);
         } 
-      } else if (program === '1') {
+      } else if (program === '1' || program === '4') {
         // ascii
+        if (program === '4') {
+          content = fromHex(content);
+        }
+        
         dealWithAscii(content);
       } else if (program === '3') {
         // binary
