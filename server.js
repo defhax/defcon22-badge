@@ -51,6 +51,7 @@ function stringToNum(content) {
 }
 
 function base64decode(content) {
+  atob = require('atob');
   console.log(atob(content));
 }
 
